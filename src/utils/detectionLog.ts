@@ -1,11 +1,14 @@
+import { type EmergencyAnalysisResult } from "@/services/hybridAIService";
+
 export interface DetectionLogEntry {
   id: number;
-  type: "fire" | "earthquake" | "flood";
+  type: "fire" | "earthquake" | "flood" | "false_alarm";
   timestamp: number;
-  source: "automatic" | "manual";
+  source: "automatic" | "manual" | "ai_filtered";
   description: string;
   actionTaken: string;
-  status: "resolved" | "pending";
+  status: "resolved" | "pending" | "filtered";
+  aiDecision?: EmergencyAnalysisResult;
 }
 
 const STORAGE_KEY = "guardian_detection_log";
@@ -54,6 +57,28 @@ export const addDetectionEntry = (
   return updated;
 };
 
+export const addFalseAlarmEntry = (
+  soundDescription: string,
+  aiDecision: EmergencyAnalysisResult
+): DetectionLogEntry[] => {
+  const log = getDetectionLog();
+  
+  const newEntry: DetectionLogEntry = {
+    id: Date.now(),
+    type: "false_alarm",
+    timestamp: Date.now(),
+    source: "ai_filtered",
+    description: `Filtered: "${soundDescription}" identified as false alarm`,
+    actionTaken: `AI Brain (${aiDecision.aiSource}) filtered in ${aiDecision.responseTimeMs}ms — no alert sent`,
+    status: "filtered",
+    aiDecision,
+  };
+  
+  const updated = [newEntry, ...log].slice(0, MAX_ENTRIES);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  return updated;
+};
+
 export const clearDetectionLog = () => {
   localStorage.removeItem(STORAGE_KEY);
 };
@@ -71,6 +96,8 @@ export const formatDetectionLabel = (type: DetectionLogEntry["type"]): string =>
       return "🌍 Earthquake alert";
     case "flood":
       return "🌊 Flood warning";
+    case "false_alarm":
+      return "🧠 Filtered false alarm";
     default:
       return "Alert triggered";
   }
