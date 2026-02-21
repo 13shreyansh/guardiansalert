@@ -39,6 +39,7 @@ import {
   type DetectionLogEntry 
 } from "@/utils/detectionLog";
 import { AIClassificationResult, AIDetectionStatus } from "@/hooks/useAIAlarmDetection";
+import type { EmergencyAnalysisResult } from "@/services/hybridAIService";
 
 const DISABILITY_LABELS: Record<DisabilityType, string> = {
   deaf: "Deaf/Hard of Hearing",
@@ -116,15 +117,49 @@ const Home = () => {
     };
   }, [navigate]);
 
-  // Automatic fire alarm detection callback
-  const handleAutoDetectedAlert = async (type: EmergencyType) => {
+  // Automatic fire alarm detection callback - AI Brain approved
+  const handleAutoDetectedAlert = async (aiDecision: EmergencyAnalysisResult) => {
     unlockAudioForEmergency();
-    triggerPersonalizedAlert(type);
+    triggerPersonalizedAlert("fire");
     
     const contacts = getEmergencyContacts();
-    const updated = addDetectionEntry(type, "automatic", contacts.length);
+    const updated = addDetectionEntry("fire", "automatic", contacts.length);
     setActivityLog(updated);
-    notifyEmergencyContacts(type);
+    notifyEmergencyContacts("fire");
+    
+    console.log("[AI Brain] Alert sent:", {
+      source: aiDecision.aiSource,
+      confidence: aiDecision.aiConfidence,
+      responseTime: `${aiDecision.responseTimeMs}ms`,
+    });
+  };
+
+  // AI Brain filtered this as a false alarm
+  const handleFalseAlarmFiltered = (aiDecision: EmergencyAnalysisResult, soundDescription: string) => {
+    // Log to activity history without triggering alerts
+    const log = getDetectionLog();
+    const newEntry = {
+      id: Date.now(),
+      type: "fire" as const,
+      timestamp: Date.now(),
+      source: "automatic" as const,
+      description: `Filtered False Alarm: ${soundDescription}`,
+      actionTaken: `AI Brain (${aiDecision.aiSource}) filtered — confidence ${Math.round(aiDecision.aiConfidence * 100)}%`,
+      status: "resolved" as const,
+    };
+    const updated = [newEntry, ...log].slice(0, 50);
+    localStorage.setItem("guardian_detection_log", JSON.stringify(updated));
+    setActivityLog(updated);
+    
+    toast.info("Sound filtered by AI", {
+      description: `"${soundDescription}" identified as non-emergency`,
+    });
+    
+    console.log("[AI Brain] False alarm filtered:", {
+      sound: soundDescription,
+      source: aiDecision.aiSource,
+      responseTime: `${aiDecision.responseTimeMs}ms`,
+    });
   };
 
   // Manual emergency report
@@ -216,7 +251,8 @@ const Home = () => {
           setAiClassification(result);
           setAiStatus(status);
         }}
-        onFireAlarmConfirmed={() => handleAutoDetectedAlert("fire")}
+        onFireAlarmConfirmed={(aiDecision) => handleAutoDetectedAlert(aiDecision)}
+        onFalseAlarmFiltered={handleFalseAlarmFiltered}
       />
       
       <div className="min-h-screen bg-background flex flex-col">
