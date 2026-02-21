@@ -2,12 +2,10 @@ import { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallba
 import { Mic, MicOff, AlertCircle, Flame, Shield, Brain, Loader2, Clock } from "lucide-react";
 import { useAIAlarmDetection, AIClassificationResult, AIDetectionStatus } from "@/hooks/useAIAlarmDetection";
 import { toast } from "@/hooks/use-toast";
-import { analyzeEmergency, type EmergencyAnalysisResult } from "@/services/hybridAIService";
 
 interface AudioMonitorProps {
   onAIClassification?: (result: AIClassificationResult, status: AIDetectionStatus) => void;
-  onFireAlarmConfirmed?: (aiDecision: EmergencyAnalysisResult) => void;
-  onFalseAlarmFiltered?: (aiDecision: EmergencyAnalysisResult, soundDescription: string) => void;
+  onFireAlarmConfirmed?: () => void;
 }
 
 export interface AudioMonitorHandle {
@@ -34,8 +32,7 @@ const COOLDOWN_DURATION_MS = 12000;
 
 const AudioMonitor = forwardRef<AudioMonitorHandle, AudioMonitorProps>(({ 
   onAIClassification,
-  onFireAlarmConfirmed,
-  onFalseAlarmFiltered
+  onFireAlarmConfirmed 
 }, ref) => {
   // SINGLE SOURCE OF TRUTH - Internal state machine
   const [internalStatus, setInternalStatus] = useState<InternalStatus>("IDLE");
@@ -54,13 +51,11 @@ const AudioMonitor = forwardRef<AudioMonitorHandle, AudioMonitorProps>(({
   
   // Refs for stable callback references
   const onFireAlarmConfirmedRef = useRef(onFireAlarmConfirmed);
-  const onFalseAlarmFilteredRef = useRef(onFalseAlarmFiltered);
   const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const cooldownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Update refs on each render
   onFireAlarmConfirmedRef.current = onFireAlarmConfirmed;
-  onFalseAlarmFilteredRef.current = onFalseAlarmFiltered;
 
   // Derive whether AI should be active based on internal status
   const isAIEnabled = internalStatus !== "COOLDOWN";
@@ -172,21 +167,8 @@ const AudioMonitor = forwardRef<AudioMonitorHandle, AudioMonitorProps>(({
       
       // Check if threshold reached
       if (detectionCountRef.current >= CONFIRMATION_THRESHOLD) {
-        // Run hybrid AI analysis before deciding action
-        const aiDecision = analyzeEmergency(
-          detectedCategory,
-          confidence > 0.7 ? "high" : confidence > 0.4 ? "medium" : "low",
-          confidence,
-          detectionCountRef.current
-        );
-
-        if (aiDecision.action === "send_alert") {
-          // AI Brain says: real emergency → trigger alert
-          onFireAlarmConfirmedRef.current?.(aiDecision);
-        } else {
-          // AI Brain says: false alarm → log only, no alert
-          onFalseAlarmFilteredRef.current?.(aiDecision, detectedCategory);
-        }
+        // Trigger the alert callback ONCE (single callback, no duplicates)
+        onFireAlarmConfirmedRef.current?.();
         
         // Reset detection counters
         detectionCountRef.current = 0;
