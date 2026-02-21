@@ -33,12 +33,14 @@ import { useSmsNotification, getEmergencyContacts } from "@/hooks/useSmsNotifica
 import { toast } from "sonner";
 import { 
   getDetectionLog, 
-  addDetectionEntry, 
+  addDetectionEntry,
+  addFalseAlarmEntry,
   formatDetectionTime, 
   formatDetectionLabel,
   type DetectionLogEntry 
 } from "@/utils/detectionLog";
 import { AIClassificationResult, AIDetectionStatus } from "@/hooks/useAIAlarmDetection";
+import { type EmergencyAnalysisResult } from "@/services/hybridAIService";
 
 const DISABILITY_LABELS: Record<DisabilityType, string> = {
   deaf: "Deaf/Hard of Hearing",
@@ -116,8 +118,8 @@ const Home = () => {
     };
   }, [navigate]);
 
-  // Automatic fire alarm detection callback
-  const handleAutoDetectedAlert = async (type: EmergencyType) => {
+  // Automatic fire alarm detection callback - only called when AI Brain says "send_alert"
+  const handleAutoDetectedAlert = async (type: EmergencyType, aiDecision?: EmergencyAnalysisResult) => {
     unlockAudioForEmergency();
     triggerPersonalizedAlert(type);
     
@@ -125,6 +127,12 @@ const Home = () => {
     const updated = addDetectionEntry(type, "automatic", contacts.length);
     setActivityLog(updated);
     notifyEmergencyContacts(type);
+  };
+
+  // False alarm filtered by AI Brain - log only, no alert
+  const handleFalseAlarmFiltered = (aiDecision: EmergencyAnalysisResult, soundDescription: string) => {
+    const updated = addFalseAlarmEntry(soundDescription, aiDecision);
+    setActivityLog(updated);
   };
 
   // Manual emergency report
@@ -216,7 +224,8 @@ const Home = () => {
           setAiClassification(result);
           setAiStatus(status);
         }}
-        onFireAlarmConfirmed={() => handleAutoDetectedAlert("fire")}
+        onFireAlarmConfirmed={(aiDecision) => handleAutoDetectedAlert("fire", aiDecision)}
+        onFalseAlarmFiltered={handleFalseAlarmFiltered}
       />
       
       <div className="min-h-screen bg-background flex flex-col">
