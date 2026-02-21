@@ -74,6 +74,7 @@ const Home = () => {
   const { notifyEmergencyContacts, resetSmsFlag } = useSmsNotification();
   const audioMonitorRef = useRef<AudioMonitorHandle>(null);
   const checkIntervalRef = useRef<number>(0);
+  const [lastAiDecision, setLastAiDecision] = useState<EmergencyAnalysisResult | null>(null);
 
   useEffect(() => {
     const data = localStorage.getItem("guardian_data");
@@ -140,6 +141,7 @@ const Home = () => {
   // Automatic fire alarm detection callback - only called when AI Brain says "send_alert"
   const handleAutoDetectedAlert = async (type: EmergencyType, aiDecision?: EmergencyAnalysisResult) => {
     unlockAudioForEmergency();
+    if (aiDecision) setLastAiDecision(aiDecision);
     triggerPersonalizedAlert(type);
     
     const contacts = getEmergencyContacts();
@@ -208,6 +210,7 @@ const Home = () => {
           emergencyType={emergencyType} 
           onDismiss={handleDismissAlert}
           extraMessage={config.extraMessage}
+          aiDecision={lastAiDecision}
         />
       );
     }
@@ -227,6 +230,7 @@ const Home = () => {
           emergencyType={emergencyType} 
           onDismiss={handleDismissAlert}
           extraMessage={config.extraMessage}
+          aiDecision={lastAiDecision}
         />
         <AudioAlert 
           emergencyType={emergencyType} 
