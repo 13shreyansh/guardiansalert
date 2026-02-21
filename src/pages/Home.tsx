@@ -126,13 +126,17 @@ const Home = () => {
     const contacts = getEmergencyContacts();
     const updated = addDetectionEntry(type, "automatic", contacts.length);
     setActivityLog(updated);
-    notifyEmergencyContacts(type);
+    notifyEmergencyContacts(type, aiDecision);
   };
 
-  // False alarm filtered by AI Brain - log only, no alert
+  // False alarm filtered by AI Brain - log only, no alert, show green toast
   const handleFalseAlarmFiltered = (aiDecision: EmergencyAnalysisResult, soundDescription: string) => {
     const updated = addFalseAlarmEntry(soundDescription, aiDecision);
     setActivityLog(updated);
+    
+    toast.success(`Sound filtered: ${soundDescription} — Not an emergency`, {
+      description: `${aiDecision.aiSource === "local_ai" ? "Local AI" : "Cloud AI"} • ${aiDecision.responseTimeMs}ms • ${Math.round(aiDecision.aiConfidence * 100)}% confidence`,
+    });
   };
 
   // Manual emergency report

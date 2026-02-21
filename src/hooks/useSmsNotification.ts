@@ -89,7 +89,7 @@ export const useSmsNotification = () => {
     setSmsSentForCurrentAlert(false);
   }, []);
 
-  const notifyEmergencyContacts = useCallback(async (emergencyType: EmergencyType) => {
+  const notifyEmergencyContacts = useCallback(async (emergencyType: EmergencyType, aiDecision?: { aiSource: string; responseTimeMs: number; aiConfidence: number }) => {
     // Check if SMS is explicitly disabled (defaults to enabled)
     const smsDisabled = localStorage.getItem("guardian_sms_enabled") === "false";
     
@@ -158,20 +158,26 @@ export const useSmsNotification = () => {
       if (data?.success) {
         setLastSmsSentTime();
         
-        // Toast 1: SMS notification
+        // Toast 1: SMS notification with AI badge
         if (!smsDisabled) {
+          const aiBadge = aiDecision 
+            ? ` • ${aiDecision.aiSource === "local_ai" ? "🔵 Local AI" : "🟠 Cloud AI"} - ${aiDecision.responseTimeMs}ms`
+            : "";
           toast({
-            title: "📱 Emergency contacts notified ✓",
-            description: `SMS sent to ${contacts.length} contact(s)`,
+            title: `📱 Emergency contacts notified ✓`,
+            description: `SMS sent to ${contacts.length} contact(s)${aiBadge}`,
           });
         }
 
-        // Toast 2: 911 / Emergency services notification
+        // Toast 2: 911 / Emergency services notification with AI badge
         if (!voiceCallDisabled) {
+          const aiBadge = aiDecision 
+            ? ` • ${aiDecision.aiSource === "local_ai" ? "🔵 Local AI" : "🟠 Cloud AI"} - ${aiDecision.responseTimeMs}ms`
+            : "";
           setTimeout(() => {
             toast({
               title: "🚨 911 notified ✓",
-              description: "Emergency services have been alerted",
+              description: `Emergency services have been alerted${aiBadge}`,
             });
           }, 800);
         }
