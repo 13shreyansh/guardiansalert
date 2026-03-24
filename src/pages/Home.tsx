@@ -265,7 +265,7 @@ const Home = () => {
               <div className="flex flex-col items-center text-center space-y-3">
                 <div className="relative">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Brain className="w-8 h-8 text-primary" />
+                    <Shield className="w-8 h-8 text-primary" />
                   </div>
                   {/* Live waveform */}
                   <div className="absolute -right-2 -bottom-1">
