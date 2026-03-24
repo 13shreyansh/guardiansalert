@@ -62,13 +62,6 @@ const Home = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [aiClassification, setAiClassification] = useState<AIClassificationResult>(null);
   const [aiStatus, setAiStatus] = useState<AIDetectionStatus>("initializing");
-  const [aiBrainStats, setAiBrainStats] = useState<AIBrainStats>({
-    lastDecision: null,
-    lastSoundName: null,
-    localCount: 0,
-    cloudCount: 0,
-    falseAlarmCount: 0,
-  });
   const { alertState, triggerPersonalizedAlert, dismissAlert } = usePersonalizedAlert();
   const { notifyEmergencyContacts, resetSmsFlag } = useSmsNotification();
   const audioMonitorRef = useRef<AudioMonitorHandle>(null);
