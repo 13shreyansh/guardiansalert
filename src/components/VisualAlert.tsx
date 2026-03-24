@@ -7,7 +7,6 @@ interface VisualAlertProps {
   emergencyType: EmergencyType;
   onDismiss: () => void;
   extraMessage?: string;
-  aiDecision?: { aiSource: string; responseTimeMs: number } | null;
 }
 
 const emergencyConfig = {
