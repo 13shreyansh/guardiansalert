@@ -27,7 +27,7 @@ const emergencyConfig = {
   },
 };
 
-const VisualAlert = ({ emergencyType, onDismiss, extraMessage, aiDecision }: VisualAlertProps) => {
+const VisualAlert = ({ emergencyType, onDismiss, extraMessage }: VisualAlertProps) => {
   const vibrationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
