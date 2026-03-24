@@ -123,15 +123,12 @@ const Home = () => {
   // Automatic fire alarm detection callback - only called when AI Brain says "send_alert"
   const handleAutoDetectedAlert = async (type: EmergencyType, aiDecision?: EmergencyAnalysisResult) => {
     unlockAudioForEmergency();
-    if (aiDecision) setLastAiDecision(aiDecision);
     triggerPersonalizedAlert(type);
     
     const contacts = getEmergencyContacts();
     const updated = addDetectionEntry(type, "automatic", contacts.length);
     setActivityLog(updated);
-    notifyEmergencyContacts(type, aiDecision);
-
-    if (aiDecision) trackAIDecision(aiDecision, type);
+    notifyEmergencyContacts(type);
   };
 
   // False alarm filtered by AI Brain - log only, no alert, show green toast
