@@ -41,7 +41,6 @@ import {
 } from "@/utils/detectionLog";
 import { AIClassificationResult, AIDetectionStatus } from "@/hooks/useAIAlarmDetection";
 import { type EmergencyAnalysisResult } from "@/services/hybridAIService";
-import AIBrainMonitor, { type AIBrainStats } from "@/components/AIBrainMonitor";
 
 const DISABILITY_LABELS: Record<DisabilityType, string> = {
   deaf: "Deaf/Hard of Hearing",
