@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, CheckCircle, Users, MessageSquare, Clock, AlertTriangle, Brain } from "lucide-react";
+import { Shield, CheckCircle, Users, MessageSquare, Clock, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +41,6 @@ import {
 } from "@/utils/detectionLog";
 import { AIClassificationResult, AIDetectionStatus } from "@/hooks/useAIAlarmDetection";
 import { type EmergencyAnalysisResult } from "@/services/hybridAIService";
-import AIBrainMonitor, { type AIBrainStats } from "@/components/AIBrainMonitor";
 
 const DISABILITY_LABELS: Record<DisabilityType, string> = {
   deaf: "Deaf/Hard of Hearing",
@@ -63,18 +62,11 @@ const Home = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [aiClassification, setAiClassification] = useState<AIClassificationResult>(null);
   const [aiStatus, setAiStatus] = useState<AIDetectionStatus>("initializing");
-  const [aiBrainStats, setAiBrainStats] = useState<AIBrainStats>({
-    lastDecision: null,
-    lastSoundName: null,
-    localCount: 0,
-    cloudCount: 0,
-    falseAlarmCount: 0,
-  });
   const { alertState, triggerPersonalizedAlert, dismissAlert } = usePersonalizedAlert();
   const { notifyEmergencyContacts, resetSmsFlag } = useSmsNotification();
   const audioMonitorRef = useRef<AudioMonitorHandle>(null);
   const checkIntervalRef = useRef<number>(0);
-  const [lastAiDecision, setLastAiDecision] = useState<EmergencyAnalysisResult | null>(null);
+  
 
   useEffect(() => {
     const data = localStorage.getItem("guardian_data");
@@ -127,39 +119,25 @@ const Home = () => {
     };
   }, [navigate]);
 
-  // Update AI Brain stats helper
-  const trackAIDecision = (aiDecision: EmergencyAnalysisResult, soundName: string) => {
-    setAiBrainStats(prev => ({
-      lastDecision: aiDecision,
-      lastSoundName: soundName,
-      localCount: prev.localCount + (aiDecision.aiSource === "local_ai" ? 1 : 0),
-      cloudCount: prev.cloudCount + (aiDecision.aiSource === "cloud_ai" ? 1 : 0),
-      falseAlarmCount: prev.falseAlarmCount + (aiDecision.action === "log_only" ? 1 : 0),
-    }));
-  };
 
   // Automatic fire alarm detection callback - only called when AI Brain says "send_alert"
   const handleAutoDetectedAlert = async (type: EmergencyType, aiDecision?: EmergencyAnalysisResult) => {
     unlockAudioForEmergency();
-    if (aiDecision) setLastAiDecision(aiDecision);
     triggerPersonalizedAlert(type);
     
     const contacts = getEmergencyContacts();
     const updated = addDetectionEntry(type, "automatic", contacts.length);
     setActivityLog(updated);
-    notifyEmergencyContacts(type, aiDecision);
-
-    if (aiDecision) trackAIDecision(aiDecision, type);
+    notifyEmergencyContacts(type);
   };
 
   // False alarm filtered by AI Brain - log only, no alert, show green toast
   const handleFalseAlarmFiltered = (aiDecision: EmergencyAnalysisResult, soundDescription: string) => {
     const updated = addFalseAlarmEntry(soundDescription, aiDecision);
     setActivityLog(updated);
-    trackAIDecision(aiDecision, soundDescription);
     
     toast.success(`Sound filtered: ${soundDescription} — Not an emergency`, {
-      description: `${aiDecision.aiSource === "local_ai" ? "Local AI" : "Cloud AI"} • ${aiDecision.responseTimeMs}ms • ${Math.round(aiDecision.aiConfidence * 100)}% confidence`,
+      description: `${Math.round(aiDecision.aiConfidence * 100)}% confidence`,
     });
   };
 
@@ -210,7 +188,6 @@ const Home = () => {
           emergencyType={emergencyType} 
           onDismiss={handleDismissAlert}
           extraMessage={config.extraMessage}
-          aiDecision={lastAiDecision}
         />
       );
     }
@@ -230,7 +207,6 @@ const Home = () => {
           emergencyType={emergencyType} 
           onDismiss={handleDismissAlert}
           extraMessage={config.extraMessage}
-          aiDecision={lastAiDecision}
         />
         <AudioAlert 
           emergencyType={emergencyType} 
@@ -289,7 +265,7 @@ const Home = () => {
               <div className="flex flex-col items-center text-center space-y-3">
                 <div className="relative">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Brain className="w-8 h-8 text-primary" />
+                    <Shield className="w-8 h-8 text-primary" />
                   </div>
                   {/* Live waveform */}
                   <div className="absolute -right-2 -bottom-1">
@@ -431,8 +407,6 @@ const Home = () => {
             </CardContent>
           </Card>
 
-          {/* AI Brain Monitor */}
-          <AIBrainMonitor stats={aiBrainStats} />
 
           {/* Card 4: Quick Info */}
           <div className="grid grid-cols-3 gap-3">
