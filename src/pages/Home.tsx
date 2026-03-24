@@ -188,7 +188,6 @@ const Home = () => {
           emergencyType={emergencyType} 
           onDismiss={handleDismissAlert}
           extraMessage={config.extraMessage}
-          aiDecision={lastAiDecision}
         />
       );
     }
@@ -208,7 +207,6 @@ const Home = () => {
           emergencyType={emergencyType} 
           onDismiss={handleDismissAlert}
           extraMessage={config.extraMessage}
-          aiDecision={lastAiDecision}
         />
         <AudioAlert 
           emergencyType={emergencyType} 
