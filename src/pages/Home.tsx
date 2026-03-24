@@ -135,10 +135,9 @@ const Home = () => {
   const handleFalseAlarmFiltered = (aiDecision: EmergencyAnalysisResult, soundDescription: string) => {
     const updated = addFalseAlarmEntry(soundDescription, aiDecision);
     setActivityLog(updated);
-    trackAIDecision(aiDecision, soundDescription);
     
     toast.success(`Sound filtered: ${soundDescription} — Not an emergency`, {
-      description: `${aiDecision.aiSource === "local_ai" ? "Local AI" : "Cloud AI"} • ${aiDecision.responseTimeMs}ms • ${Math.round(aiDecision.aiConfidence * 100)}% confidence`,
+      description: `${Math.round(aiDecision.aiConfidence * 100)}% confidence`,
     });
   };
 
