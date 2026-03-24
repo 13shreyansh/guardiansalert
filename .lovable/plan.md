@@ -1,22 +1,40 @@
 
 
-## Change Cooldown Duration to 20 Seconds
+# Remove Branding & AI Source References
 
-### Summary
-Update the cooldown duration constant from 30 seconds to 20 seconds in the AudioMonitor component.
+## Summary
+Remove all "Built for INTUition 2026" text, the entire AI Brain Monitor section, and all Local/Cloud AI badges from the app.
 
-### Change
-**File:** `src/components/AudioMonitor.tsx`
+## Changes
 
-**Line 31:** Change the `COOLDOWN_DURATION_MS` constant from `30000` to `20000`
+### 1. `src/pages/Settings.tsx`
+- Remove lines 414-416 ("Built for INTUition 2026" paragraph)
 
-```typescript
-// Before
-const COOLDOWN_DURATION_MS = 30000;
+### 2. `src/components/AIBrainMonitor.tsx`
+- Delete this entire file
 
-// After
-const COOLDOWN_DURATION_MS = 20000;
-```
+### 3. `src/pages/Home.tsx`
+- Remove import of `AIBrainMonitor` and its type
+- Remove `aiBrainStats` state and `trackAIDecision` helper
+- Remove `lastAiDecision` state
+- Remove `<AIBrainMonitor stats={aiBrainStats} />` from JSX
+- Remove `aiDecision={lastAiDecision}` prop from `VisualAlert`
+- Remove `trackAIDecision` calls from `handleAutoDetectedAlert` and `handleFalseAlarmFiltered`
+- Simplify toast in `handleFalseAlarmFiltered` to remove Local/Cloud AI mention
+- Remove `Brain` icon import (replace monitoring card icon with `Shield`)
 
-This single-line change will reduce the cooldown period after a fire alarm is confirmed from 30 seconds to 20 seconds.
+### 4. `src/components/VisualAlert.tsx`
+- Remove `aiDecision` from props interface
+- Remove the AI Decision Badge JSX block (lines ~113-128)
+
+### 5. `src/hooks/useSmsNotification.ts`
+- Remove `aiBadge` construction and usage from toast descriptions (lines ~163-165, ~174-176)
+- Remove `aiDecision` parameter from `notifyEmergencyContacts`
+
+### 6. `src/services/hybridAIService.ts`
+- Remove the "MOCK LOGIC - Will be replaced with real FunctionGemma + Gemini hybrid AI brain" comment
+- Keep `aiSource` field in the interface/logic (internal use) but it won't be displayed anywhere
+
+### 7. `README.md`
+- Remove the "Built For INTUition 2026" section (lines ~109-113)
 
