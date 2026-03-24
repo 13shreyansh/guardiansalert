@@ -119,16 +119,6 @@ const Home = () => {
     };
   }, [navigate]);
 
-  // Update AI Brain stats helper
-  const trackAIDecision = (aiDecision: EmergencyAnalysisResult, soundName: string) => {
-    setAiBrainStats(prev => ({
-      lastDecision: aiDecision,
-      lastSoundName: soundName,
-      localCount: prev.localCount + (aiDecision.aiSource === "local_ai" ? 1 : 0),
-      cloudCount: prev.cloudCount + (aiDecision.aiSource === "cloud_ai" ? 1 : 0),
-      falseAlarmCount: prev.falseAlarmCount + (aiDecision.action === "log_only" ? 1 : 0),
-    }));
-  };
 
   // Automatic fire alarm detection callback - only called when AI Brain says "send_alert"
   const handleAutoDetectedAlert = async (type: EmergencyType, aiDecision?: EmergencyAnalysisResult) => {
