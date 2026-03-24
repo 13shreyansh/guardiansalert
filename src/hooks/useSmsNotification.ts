@@ -89,7 +89,7 @@ export const useSmsNotification = () => {
     setSmsSentForCurrentAlert(false);
   }, []);
 
-  const notifyEmergencyContacts = useCallback(async (emergencyType: EmergencyType, aiDecision?: { aiSource: string; responseTimeMs: number; aiConfidence: number }) => {
+  const notifyEmergencyContacts = useCallback(async (emergencyType: EmergencyType) => {
     // Check if SMS is explicitly disabled (defaults to enabled)
     const smsDisabled = localStorage.getItem("guardian_sms_enabled") === "false";
     
