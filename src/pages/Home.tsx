@@ -66,7 +66,7 @@ const Home = () => {
   const { notifyEmergencyContacts, resetSmsFlag } = useSmsNotification();
   const audioMonitorRef = useRef<AudioMonitorHandle>(null);
   const checkIntervalRef = useRef<number>(0);
-  const [lastAiDecision, setLastAiDecision] = useState<EmergencyAnalysisResult | null>(null);
+  
 
   useEffect(() => {
     const data = localStorage.getItem("guardian_data");
