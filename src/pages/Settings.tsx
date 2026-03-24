@@ -411,9 +411,6 @@ const Settings = () => {
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </button>
 
-              <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
-                Built for INTUition 2026
-              </p>
             </CardContent>
           </Card>
         </div>

@@ -160,24 +160,17 @@ export const useSmsNotification = () => {
         
         // Toast 1: SMS notification with AI badge
         if (!smsDisabled) {
-          const aiBadge = aiDecision 
-            ? ` • ${aiDecision.aiSource === "local_ai" ? "🔵 Local AI" : "🟠 Cloud AI"} - ${aiDecision.responseTimeMs}ms`
-            : "";
           toast({
             title: `📱 Emergency contacts notified ✓`,
-            description: `SMS sent to ${contacts.length} contact(s)${aiBadge}`,
+            description: `SMS sent to ${contacts.length} contact(s)`,
           });
         }
 
-        // Toast 2: 911 / Emergency services notification with AI badge
         if (!voiceCallDisabled) {
-          const aiBadge = aiDecision 
-            ? ` • ${aiDecision.aiSource === "local_ai" ? "🔵 Local AI" : "🟠 Cloud AI"} - ${aiDecision.responseTimeMs}ms`
-            : "";
           setTimeout(() => {
             toast({
               title: "🚨 911 notified ✓",
-              description: `Emergency services have been alerted${aiBadge}`,
+              description: `Emergency services have been alerted`,
             });
           }, 800);
         }

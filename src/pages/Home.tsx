@@ -407,8 +407,6 @@ const Home = () => {
             </CardContent>
           </Card>
 
-          {/* AI Brain Monitor */}
-          <AIBrainMonitor stats={aiBrainStats} />
 
           {/* Card 4: Quick Info */}
           <div className="grid grid-cols-3 gap-3">

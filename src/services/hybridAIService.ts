@@ -1,5 +1,3 @@
-// MOCK LOGIC - Will be replaced with real FunctionGemma + Gemini hybrid AI brain
-
 export interface EmergencyAnalysisResult {
   action: "send_alert" | "log_only";
   emergencyType: string;

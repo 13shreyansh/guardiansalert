@@ -106,14 +106,6 @@ This is just the beginning. Our roadmap includes:
 
 ---
 
-## Built For INTUition 2026
-
-Guardian Alert was created during the INTUition 2026 hackathon with a single mission: **ensure that in a crisis, no one is left behind.**
-
-We believe technology should serve everyone, not just those who fit the "default" user profile. Accessibility isn't a feature—it's a fundamental human right.
-
----
-
 **[Live Demo](https://guardiansalert.lovable.app)** • **[Pitch Video](https://www.youtube.com/playlist?list=PLRjIbTD2eeN5t_PZH_3GQrsMUdV6jLJw4)** • **[GitHub](https://github.com/Yash-PoPularPlusPlus/guardiansalert)**
 
 ---

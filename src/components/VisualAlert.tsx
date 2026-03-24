@@ -110,23 +110,6 @@ const VisualAlert = ({ emergencyType, onDismiss, extraMessage }: VisualAlertProp
           </p>
         )}
 
-        {/* AI Decision Badge */}
-        {aiDecision && (
-          <div 
-            className="mt-2 inline-flex items-center gap-2 rounded-full px-4 py-1.5"
-            style={{ 
-              backgroundColor: aiDecision.aiSource === "local_ai" ? "rgba(59,130,246,0.25)" : "rgba(249,115,22,0.25)",
-              backdropFilter: "blur(4px)",
-            }}
-          >
-            <span 
-              className="text-sm font-semibold text-white"
-            >
-              {aiDecision.aiSource === "local_ai" ? "🔵 Local AI" : "🟠 Cloud AI"} — {aiDecision.responseTimeMs}ms
-            </span>
-          </div>
-        )}
-
         <Button
           onClick={handleDismiss}
           className="mt-8 bg-white text-gray-900 hover:bg-gray-100 font-bold text-lg rounded-xl min-h-[56px]"
